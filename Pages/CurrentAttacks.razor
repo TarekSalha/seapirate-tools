@@ -1,282 +1,208 @@
+@page "/attacks"
 @page "/current-attacks"
-@using InselkampfTools.Website.Data
-@using InselkampfTools.Website.Services
+@using SEAPIRATE.Website.Data
+@using SEAPIRATE.Website.Services
 @inject AttackService AttackService
 @inject NavigationManager NavigationManager
 
-<PageTitle>Current Attacks</PageTitle>
+<PageTitle>SEAPIRATE - Attack Management</PageTitle>
 
-<div class="container">
-    <h1>Attack Planner</h1>
-    
+<div class="container-fluid">
     <div class="row mb-4">
-        <div class="col">
-            <div class="card">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Suggested Attacks</h5>
-                    <button class="btn btn-sm btn-light" @onclick="() => showAddAttackModal = true">
-                        <span class="oi oi-plus"></span> Add Attack
-                    </button>
-                </div>
-                <div class="card-body">
-                    @if (suggestedAttacks == null)
-                    {
-                        <p><em>Loading...</em></p>
-                    }
-                    else if (!suggestedAttacks.Any())
-                    {
-                        <p>No suggested attacks available.</p>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Target</th>
-                                        <th>Player</th>
-                                        <th>Expected Resources</th>
-                                        <th>Suggested Time</th>
-                                        <th>Notes</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var attack in suggestedAttacks)
-                                    {
-                                        <tr>
-                                            <td>@attack.TargetIsland</td>
-                                            <td>@attack.TargetPlayer</td>
-                                            <td>@attack.ExpectedResources.ToString("N0")</td>
-                                            <td>@attack.SuggestedTime.ToString("g")</td>
-                                            <td>@attack.Notes</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-success" @onclick="() => StartAttack(attack.Id)">
-                                                    <span class="oi oi-check"></span> Start Attack
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                </div>
-            </div>
+        <div class="col-12">
+            <h1 class="display-4">🎯 Attack Management</h1>
+            <p class="lead text-muted">Plan, execute, and track your pirate raids</p>
         </div>
     </div>
-    
-    <div class="row mb-4">
-        <div class="col">
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">Pending Attacks</h5>
-                </div>
-                <div class="card-body">
-                    @if (pendingAttacks == null)
-                    {
-                        <p><em>Loading...</em></p>
-                    }
-                    else if (!pendingAttacks.Any())
-                    {
-                        <p>No pending attacks.</p>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Target</th>
-                                        <th>Player</th>
-                                        <th>Expected Resources</th>
-                                        <th>Started At</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var attack in pendingAttacks)
-                                    {
-                                        <tr>
-                                            <td>@attack.TargetIsland</td>
-                                            <td>@attack.TargetPlayer</td>
-                                            <td>@attack.ExpectedResources.ToString("N0")</td>
-                                            <td>@attack.StartedAt?.ToString("g")</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-danger" @onclick="() => FailAttack(attack.Id)">
-                                                    <span class="oi oi-x"></span> Mark Failed
-                                                </button>
-                                                <button class="btn btn-sm btn-primary" @onclick="() => NavigateToFightReport(attack.Id)">
-                                                    <span class="oi oi-document"></span> Submit Report
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-    
+
     <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Completed Attacks</h5>
-                    <button class="btn btn-sm btn-light" @onclick="ToggleCompletedAttacks">
-                        @(showCompletedAttacks ? "Hide" : "Show")
-                    </button>
+        <!-- Suggested Attacks -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">💡 Suggested Attacks (@suggestedAttacks.Count)</h4>
                 </div>
-                <div class="card-body">
-                    @if (showCompletedAttacks)
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    @if (suggestedAttacks.Count == 0)
                     {
-                        @if (completedAttacks == null)
+                        <p class="text-muted">No suggested attacks available.</p>
+                        <button class="btn btn-primary" @onclick="AddSampleAttacks">Add Sample Attacks</button>
+                    }
+                    else
+                    {
+                        @foreach (var attack in suggestedAttacks)
                         {
-                            <p><em>Loading...</em></p>
-                        }
-                        else if (!completedAttacks.Any())
-                        {
-                            <p>No completed attacks.</p>
-                        }
-                        else
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Target</th>
-                                            <th>Player</th>
-                                            <th>Expected Resources</th>
-                                            <th>Actual Resources</th>
-                                            <th>Completed At</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var attack in completedAttacks)
-                                        {
-                                            <tr class="@(attack.Status == AttackStatus.Failed ? "table-danger" : "table-success")">
-                                                <td>@attack.TargetIsland</td>
-                                                <td>@attack.TargetPlayer</td>
-                                                <td>@attack.ExpectedResources.ToString("N0")</td>
-                                                <td>@(attack.ActualResourcesGained?.ToString("N0") ?? "N/A")</td>
-                                                <td>@attack.CompletedAt?.ToString("g")</td>
-                                                <td>@attack.Status</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                            <div class="card mb-2 border-info">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title">🏝️ @attack.TargetIsland</h6>
+                                    <p class="card-text mb-1">
+                                        <strong>Player:</strong> @attack.TargetPlayer<br>
+                                        <strong>Expected:</strong> @attack.ExpectedResources.ToString("N0") resources<br>
+                                        <strong>Time:</strong> @attack.SuggestedTime.ToString("g")
+                                    </p>
+                                    @if (!string.IsNullOrEmpty(attack.Notes))
+                                    {
+                                        <p class="card-text"><small class="text-muted">@attack.Notes</small></p>
+                                    }
+                                    <button class="btn btn-success btn-sm" @onclick="() => StartAttack(attack.Id)">
+                                        ⚔️ Start Attack
+                                    </button>
+                                </div>
                             </div>
                         }
                     }
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Attacks -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">⏳ Pending Attacks (@pendingAttacks.Count)</h4>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    @if (pendingAttacks.Count == 0)
+                    {
+                        <p class="text-muted">No pending attacks.</p>
+                    }
                     else
                     {
-                        <p>Click "Show" to view completed attacks.</p>
+                        @foreach (var attack in pendingAttacks)
+                        {
+                            <div class="card mb-2 border-warning">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title">🏝️ @attack.TargetIsland</h6>
+                                    <p class="card-text mb-1">
+                                        <strong>Player:</strong> @attack.TargetPlayer<br>
+                                        <strong>Expected:</strong> @attack.ExpectedResources.ToString("N0") resources<br>
+                                        <strong>Started:</strong> @attack.StartedAt?.ToString("g")
+                                    </p>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-primary" @onclick="() => SubmitReport(attack.Id)">
+                                            📋 Submit Report
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="() => FailAttack(attack.Id)">
+                                            ❌ Mark Failed
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Attacks -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">✅ Completed Attacks (@completedAttacks.Count)</h4>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    @if (completedAttacks.Count == 0)
+                    {
+                        <p class="text-muted">No completed attacks yet.</p>
+                    }
+                    else
+                    {
+                        @foreach (var attack in completedAttacks)
+                        {
+                            <div class="card mb-2 @(attack.Status == AttackStatus.Completed ? "border-success" : "border-danger")">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title">🏝️ @attack.TargetIsland</h6>
+                                    <p class="card-text mb-1">
+                                        <strong>Player:</strong> @attack.TargetPlayer<br>
+                                        <strong>Expected:</strong> @attack.ExpectedResources.ToString("N0")<br>
+                                        @if (attack.Status == AttackStatus.Completed)
+                                        {
+                                            <strong>Actual:</strong> <span class="text-success">@attack.ActualResourcesGained?.ToString("N0")</span><br>
+                                        }
+                                        <strong>Completed:</strong> @attack.CompletedAt?.ToString("g")
+                                    </p>
+                                    <span class="badge @(attack.Status == AttackStatus.Completed ? "bg-success" : "bg-danger")">
+                                        @(attack.Status == AttackStatus.Completed ? "✅ Success" : "❌ Failed")
+                                    </span>
+                                </div>
+                            </div>
+                        }
                     }
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-@if (showAddAttackModal)
-{
-    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Attack</h5>
-                    <button type="button" class="close" @onclick="() => showAddAttackModal = false">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <!-- Add New Attack -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">➕ Add New Attack Target</h4>
                 </div>
-                <div class="modal-body">
-                    <EditForm Model="@newAttack" OnValidSubmit="AddAttack">
+                <div class="card-body">
+                    <EditForm Model="@newAttack" OnValidSubmit="@AddNewAttack">
                         <DataAnnotationsValidator />
-                        <ValidationSummary />
+                        <ValidationSummary class="alert alert-danger" />
                         
-                        <div class="form-group mb-3">
-                            <label for="targetIsland">Target Island</label>
-                            <InputText id="targetIsland" class="form-control" @bind-Value="newAttack.TargetIsland" placeholder="Format: 12:345" />
-                            <ValidationMessage For="@(() => newAttack.TargetIsland)" />
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="targetIsland" class="form-label">Target Island:</label>
+                                    <InputText id="targetIsland" @bind-Value="newAttack.TargetIsland" class="form-control" placeholder="x:y:z" />
+                                    <ValidationMessage For="@(() => newAttack.TargetIsland)" class="text-danger" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="targetPlayer" class="form-label">Target Player:</label>
+                                    <InputText id="targetPlayer" @bind-Value="newAttack.TargetPlayer" class="form-control" placeholder="Player name" />
+                                    <ValidationMessage For="@(() => newAttack.TargetPlayer)" class="text-danger" />
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label for="expectedResources" class="form-label">Expected Resources:</label>
+                                    <InputNumber id="expectedResources" @bind-Value="newAttack.ExpectedResources" class="form-control" />
+                                    <ValidationMessage For="@(() => newAttack.ExpectedResources)" class="text-danger" />
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label for="suggestedTime" class="form-label">Suggested Time:</label>
+                                    <InputDate id="suggestedTime" @bind-Value="newAttack.SuggestedTime" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Add Target</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="form-group mb-3">
-                            <label for="targetPlayer">Target Player</label>
-                            <InputText id="targetPlayer" class="form-control" @bind-Value="newAttack.TargetPlayer" />
-                            <ValidationMessage For="@(() => newAttack.TargetPlayer)" />
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="expectedResources">Expected Resources</label>
-                            <InputNumber id="expectedResources" class="form-control" @bind-Value="newAttack.ExpectedResources" />
-                            <ValidationMessage For="@(() => newAttack.ExpectedResources)" />
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="suggestedTime">Suggested Time</label>
-                            <InputDate id="suggestedTime" class="form-control" @bind-Value="newAttack.SuggestedTime" />
-                            <ValidationMessage For="@(() => newAttack.SuggestedTime)" />
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="notes">Notes</label>
-                            <InputTextArea id="notes" class="form-control" @bind-Value="newAttack.Notes" rows="3" />
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="() => showAddAttackModal = false">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Add Attack</button>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="notes" class="form-label">Notes:</label>
+                                    <InputTextArea id="notes" @bind-Value="newAttack.Notes" class="form-control" rows="2" placeholder="Optional notes about this target..." />
+                                </div>
+                            </div>
                         </div>
                     </EditForm>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal-backdrop fade show"></div>
-}
-
-@if (showFailAttackModal)
-{
-    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Mark Attack as Failed</h5>
-                    <button type="button" class="close" @onclick="() => showFailAttackModal = false">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to mark this attack as failed?</p>
-                    <div class="form-group">
-                        <label for="failureNotes">Notes (optional)</label>
-                        <textarea id="failureNotes" class="form-control" @bind="failureNotes" rows="3" placeholder="Enter any notes about why the attack failed"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="() => showFailAttackModal = false">Cancel</button>
-                    <button type="button" class="btn btn-danger" @onclick="ConfirmFailAttack">Confirm</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
-}
+</div>
 
 @code {
-    private List<AttackDto>? suggestedAttacks;
-    private List<AttackDto>? pendingAttacks;
-    private List<AttackDto>? completedAttacks;
-    private bool showCompletedAttacks = false;
-    private bool showAddAttackModal = false;
-    private bool showFailAttackModal = false;
-    private AddAttackDto newAttack = new AddAttackDto();
-    private Guid? selectedAttackId;
-    private string? failureNotes;
+    private List<AttackDto> suggestedAttacks = new();
+    private List<AttackDto> pendingAttacks = new();
+    private List<AttackDto> completedAttacks = new();
+    private AddAttackDto newAttack = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -290,42 +216,24 @@
         completedAttacks = await AttackService.GetCompletedAttacksAsync();
     }
 
-    private void ToggleCompletedAttacks()
+    private async Task StartAttack(Guid attackId)
     {
-        showCompletedAttacks = !showCompletedAttacks;
-    }
-
-    private async Task StartAttack(Guid id)
-    {
-        await AttackService.StartAttackAsync(id);
+        await AttackService.StartAttackAsync(attackId);
         await LoadAttacks();
     }
 
-    private void FailAttack(Guid id)
+    private async Task FailAttack(Guid attackId)
     {
-        selectedAttackId = id;
-        failureNotes = null;
-        showFailAttackModal = true;
+        await AttackService.FailAttackAsync(attackId, "Marked as failed by user");
+        await LoadAttacks();
     }
 
-    private async Task ConfirmFailAttack()
+    private void SubmitReport(Guid attackId)
     {
-        if (selectedAttackId.HasValue)
-        {
-            await AttackService.FailAttackAsync(selectedAttackId.Value, failureNotes);
-            showFailAttackModal = false;
-            selectedAttackId = null;
-            failureNotes = null;
-            await LoadAttacks();
-        }
+        NavigationManager.NavigateTo($"/fightreport?attackId={attackId}");
     }
 
-    private void NavigateToFightReport(Guid attackId)
-    {
-        NavigationManager.NavigateTo($"/fight-report?attackId={attackId}");
-    }
-
-    private async Task AddAttack()
+    private async Task AddNewAttack()
     {
         var attack = new AttackDto
         {
@@ -338,8 +246,13 @@
         };
 
         await AttackService.AddAttackAsync(attack);
-        showAddAttackModal = false;
         newAttack = new AddAttackDto();
+        await LoadAttacks();
+    }
+
+    private async Task AddSampleAttacks()
+    {
+        // This will trigger the seeding in the service
         await LoadAttacks();
     }
 }

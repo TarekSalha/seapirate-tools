@@ -1,8 +1,7 @@
 using Azure;
 using Azure.Data.Tables;
-using System;
 
-namespace InselkampfTools.Website.Models;
+namespace SEAPIRATE.Website.Models;
 
 public class FightReportEntity : ITableEntity
 {

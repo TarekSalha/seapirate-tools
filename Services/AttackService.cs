@@ -1,9 +1,8 @@
 using Azure.Data.Tables;
-using InselkampfTools.Website.Data;
-using InselkampfTools.Website.Models;
-using Microsoft.Extensions.Configuration;
+using SEAPIRATE.Website.Data;
+using SEAPIRATE.Website.Models;
 
-namespace InselkampfTools.Website.Services;
+namespace SEAPIRATE.Website.Services;
 
 public class AttackService
 {
@@ -36,30 +35,30 @@ public class AttackService
                 {
                     new AttackDto
                     {
-                        TargetIsland = "12:345",
-                        TargetPlayer = "PlayerOne",
-                        ExpectedResources = 15000,
+                        TargetIsland = "9:92:10",
+                        TargetPlayer = "unbenannt",
+                        ExpectedResources = 250,
                         SuggestedTime = DateTime.Now.AddHours(1),
                         Status = AttackStatus.Suggested,
-                        Notes = "Large inactive player, minimal defenses"
+                        Notes = "Small inactive island, easy target"
                     },
                     new AttackDto
                     {
-                        TargetIsland = "13:222",
-                        TargetPlayer = "PlayerTwo",
-                        ExpectedResources = 8000,
+                        TargetIsland = "6:63:9",
+                        TargetPlayer = "unbenannt",
+                        ExpectedResources = 150,
                         SuggestedTime = DateTime.Now.AddHours(2),
                         Status = AttackStatus.Suggested,
-                        Notes = "Medium resources, no fleet detected"
+                        Notes = "Low resources but safe attack"
                     },
                     new AttackDto
                     {
-                        TargetIsland = "10:111",
-                        TargetPlayer = "PlayerThree",
-                        ExpectedResources = 20000,
+                        TargetIsland = "8:36:6",
+                        TargetPlayer = "unbenannt",
+                        ExpectedResources = 300,
                         SuggestedTime = DateTime.Now.AddHours(3),
                         Status = AttackStatus.Suggested,
-                        Notes = "High value target, attack during night time"
+                        Notes = "Medium value target, attack during night"
                     }
                 };
 

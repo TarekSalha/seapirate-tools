@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\TarekSalha\\source\\seapirate-tools\\InselkampfTools.Website.csproj": {}
+    "C:\\Users\\TarekSalha\\source\\InselkampfTools\\InselkampfTools.Website\\InselkampfTools.Website.csproj": {}
   },
   "projects": {
-    "C:\\Users\\TarekSalha\\source\\seapirate-tools\\InselkampfTools.Website.csproj": {
+    "C:\\Users\\TarekSalha\\source\\InselkampfTools\\InselkampfTools.Website\\InselkampfTools.Website.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\TarekSalha\\source\\seapirate-tools\\InselkampfTools.Website.csproj",
+        "projectUniqueName": "C:\\Users\\TarekSalha\\source\\InselkampfTools\\InselkampfTools.Website\\InselkampfTools.Website.csproj",
         "projectName": "InselkampfTools.Website",
-        "projectPath": "C:\\Users\\TarekSalha\\source\\seapirate-tools\\InselkampfTools.Website.csproj",
+        "projectPath": "C:\\Users\\TarekSalha\\source\\InselkampfTools\\InselkampfTools.Website\\InselkampfTools.Website.csproj",
         "packagesPath": "C:\\Users\\TarekSalha\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\TarekSalha\\source\\seapirate-tools\\obj\\",
+        "outputPath": "C:\\Users\\TarekSalha\\source\\InselkampfTools\\InselkampfTools.Website\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\TarekSalha\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -32,22 +32,11 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
-          "dependencies": {
-            "Azure.Data.Tables": {
-              "target": "Package",
-              "version": "[12.8.3, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -59,24 +48,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[7.0.20, 7.0.20]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[7.0.20, 7.0.20]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[7.0.20, 7.0.20]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[7.0.20, 7.0.20]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -85,7 +56,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.410\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

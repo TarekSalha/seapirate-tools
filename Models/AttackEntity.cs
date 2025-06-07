@@ -1,47 +1,44 @@
 using Azure;
 using Azure.Data.Tables;
-using InselkampfTools.Website.Data;
+using SEAPIRATE.Website.Data;
 
-namespace InselkampfTools.Website.Models;
+namespace SEAPIRATE.Website.Models;
 
 public class AttackEntity : ITableEntity
 {
-    public string PartitionKey { get; set; } = null!;
-    public string RowKey { get; set; } = null!;
+    public string PartitionKey { get; set; } = default!;
+    public string RowKey { get; set; } = default!;
     public DateTimeOffset? Timestamp { get; set; }
     public ETag ETag { get; set; }
 
-    // Attack-specific properties
-    public string TargetIsland { get; set; } = null!;
-    public string TargetPlayer { get; set; } = null!;
+    // Attack properties
+    public string TargetIsland { get; set; } = default!;
+    public string TargetPlayer { get; set; } = default!;
     public int ExpectedResources { get; set; }
     public DateTime SuggestedTime { get; set; }
-    public string Status { get; set; } = AttackStatus.Suggested.ToString();
+    public string Status { get; set; } = default!;
+    public string? Notes { get; set; }
     public DateTime? StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public string? FightReportId { get; set; }
     public int? ActualResourcesGained { get; set; }
-    public string? Notes { get; set; }
 
-    public AttackEntity()
-    {
-        // Default constructor for Azure Tables
-    }
+    public AttackEntity() { }
 
-    public AttackEntity(AttackDto attack, string userId = "default")
+    public AttackEntity(AttackDto attack, string userId)
     {
-        PartitionKey = userId; // Partition by user for multi-user support
+        PartitionKey = userId;
         RowKey = attack.Id.ToString();
         TargetIsland = attack.TargetIsland;
         TargetPlayer = attack.TargetPlayer;
         ExpectedResources = attack.ExpectedResources;
         SuggestedTime = attack.SuggestedTime;
         Status = attack.Status.ToString();
+        Notes = attack.Notes;
         StartedAt = attack.StartedAt;
         CompletedAt = attack.CompletedAt;
         FightReportId = attack.FightReportId;
         ActualResourcesGained = attack.ActualResourcesGained;
-        Notes = attack.Notes;
     }
 
     public AttackDto ToDto()
@@ -54,11 +51,11 @@ public class AttackEntity : ITableEntity
             ExpectedResources = ExpectedResources,
             SuggestedTime = SuggestedTime,
             Status = Enum.Parse<AttackStatus>(Status),
+            Notes = Notes,
             StartedAt = StartedAt,
             CompletedAt = CompletedAt,
             FightReportId = FightReportId,
-            ActualResourcesGained = ActualResourcesGained,
-            Notes = Notes
+            ActualResourcesGained = ActualResourcesGained
         };
     }
 }
