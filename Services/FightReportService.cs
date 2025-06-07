@@ -105,7 +105,7 @@ public class FightReportService
                 // Detailed resources - using German resource names
                 WoodGained = parsedReport.HolzGained,
                 StoneGained = parsedReport.SteineGained,
-                IronGained = parsedReport.GoldGained, // Gold is treated as the main currency/resource
+                GoldGained = parsedReport.GoldGained, // Gold is treated as the main currency/resource
                 
                 // Units
                 AttackerUnits = JsonSerializer.Serialize(parsedReport.AttackerUnits),

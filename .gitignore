@@ -180,6 +180,10 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+# Azurite local emulator files
+__azurite_db_*
+*.azurite
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml

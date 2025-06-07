@@ -27,7 +27,7 @@ public class FightReportEntity : ITableEntity
     // Detailed resources
     public int? WoodGained { get; set; }
     public int? StoneGained { get; set; }
-    public int? IronGained { get; set; }
+    public int? GoldGained { get; set; }
     public int? FoodGained { get; set; }
     
     // Units
