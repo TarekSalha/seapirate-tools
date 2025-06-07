@@ -1,0 +1,261 @@
+@page "/fightreport"
+@page "/"
+@using SEAPIRATE.Website.Data
+@using SEAPIRATE.Website.Services
+@inject FightReportService FightReportService
+@inject NavigationManager NavigationManager
+
+<PageTitle>SEAPIRATE - Fight Report Parser</PageTitle>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">🏴‍☠️ SEAPIRATE</h1>
+            <p class="lead text-muted">Seamlessly Executing Analytics for Pirate Interceptions, Raids, Attacks and Target Earmarking</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📋 Submit Fight Reports</h3>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@reportDto" OnValidSubmit="@HandleValidSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="alert alert-danger" />
+
+                        <div class="form-group mb-3">
+                            <label for="language" class="form-label">Report Language:</label>
+                            <InputSelect id="language" @bind-Value="reportDto.SelectedLanguage" class="form-select">
+                                <option value="">-- Select Language --</option>
+                                <option value="German">German (Deutsch)</option>
+                                <option value="English">English</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => reportDto.SelectedLanguage)" class="text-danger" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="inputText" class="form-label">Fight Report(s):</label>
+                            <InputTextArea id="inputText" @bind-Value="reportDto.InputText" class="form-control" rows="15" 
+                                          placeholder="Paste your fight report(s) here. You can paste multiple reports at once..." />
+                            <ValidationMessage For="@(() => reportDto.InputText)" class="text-danger" />
+                            <div class="form-text">
+                                💡 <strong>Tip:</strong> You can paste multiple fight reports at once. The system will automatically separate and process them individually.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled="@isProcessing">
+                                @if (isProcessing)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Processing Reports...</span>
+                                }
+                                else
+                                {
+                                    <span>⚔️ Parse Fight Reports</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+        @if (parsedReports != null && parsedReports.Count > 0)
+        {
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">📊 Parsed Reports (@parsedReports.Count)</h3>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        @foreach (var report in parsedReports)
+                        {
+                            <div class="card mb-3 @(report.ParseErrors.Count > 0 ? "border-warning" : "border-success")">
+                                <div class="card-header @(report.ParseErrors.Count > 0 ? "bg-warning" : "bg-success") text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            <strong>@report.AttackerName</strong> → @report.TargetIsland
+                                        </span>
+                                        <small>@report.AttackTime?.ToString("dd.MM.yyyy HH:mm")</small>
+                                    </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    @if (report.ParseErrors.Count > 0)
+                                    {
+                                        <div class="alert alert-warning alert-sm mb-2">
+                                            <small>
+                                                <strong>⚠️ Parsing Issues:</strong>
+                                                @string.Join(", ", report.ParseErrors)
+                                            </small>
+                                        </div>
+                                    }
+
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h6>🏴‍☠️ Attack Details</h6>
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td><strong>Attacker:</strong></td>
+                                                    <td>@(report.AttackerName ?? "Unknown")</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Target:</strong></td>
+                                                    <td>@(report.TargetIsland ?? "Unknown")</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Defender:</strong></td>
+                                                    <td>@(report.DefenderName ?? "Unknown")</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Result:</strong></td>
+                                                    <td>
+                                                        @if (report.AttackSuccessful == true)
+                                                        {
+                                                            <span class="badge bg-success">✅ Victory</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-danger">❌ Defeat</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-6">
+                                            <h6>💰 Resources Plundered</h6>
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td><strong>🪙 Gold:</strong></td>
+                                                    <td>@(report.GoldGained?.ToString("N0") ?? "0")</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>🪨 Stone:</strong></td>
+                                                    <td>@(report.SteineGained?.ToString("N0") ?? "0")</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>🪵 Wood:</strong></td>
+                                                    <td>@(report.HolzGained?.ToString("N0") ?? "0")</td>
+                                                </tr>
+                                                <tr class="table-success">
+                                                    <td><strong>📦 Total:</strong></td>
+                                                    <td><strong>@(report.TotalResourcesGained?.ToString("N0") ?? "0")</strong></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    @if (report.AttackerUnits.Count > 0)
+                                    {
+                                        <div class="mt-3">
+                                            <h6>⚔️ Fleet Composition</h6>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Unit</th>
+                                                                <th>Total</th>
+                                                                <th>Losses</th>
+                                                                <th>Survived</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var unit in report.AttackerUnits)
+                                                            {
+                                                                var losses = report.AttackerLosses.GetValueOrDefault(unit.Key, 0);
+                                                                var survived = unit.Value - losses;
+                                                                <tr>
+                                                                    <td>@unit.Key</td>
+                                                                    <td>@unit.Value</td>
+                                                                    <td class="@(losses > 0 ? "text-danger" : "text-success")">@losses</td>
+                                                                    <td class="@(survived == unit.Value ? "text-success" : "text-warning")">@survived</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="mt-4 text-center">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="card bg-primary text-white">
+                                        <div class="card-body">
+                                            <h5>@parsedReports.Count</h5>
+                                            <small>Reports Processed</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body">
+                                            <h5>@parsedReports.Sum(r => r.TotalResourcesGained ?? 0).ToString("N0")</h5>
+                                            <small>Total Resources</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card bg-info text-white">
+                                        <div class="card-body">
+                                            <h5>@parsedReports.Count(r => r.AttackSuccessful == true)</h5>
+                                            <small>Successful Raids</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-grid gap-2">
+                            <button class="btn btn-secondary" @onclick="ResetForm">📝 Submit More Reports</button>
+                            <button class="btn btn-primary" @onclick="GoToAttacks">🎯 View Attack Management</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private FightReportDto reportDto = new();
+    private List<ParsedFightReport>? parsedReports;
+    private bool isProcessing = false;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isProcessing = true;
+            parsedReports = await FightReportService.ProcessMultipleFightReportsAsync(reportDto.InputText, reportDto.SelectedLanguage);
+        }
+        catch (Exception ex)
+        {
+            // In a real app, you'd want to log this and show a more user-friendly error
+            Console.WriteLine($"Error processing reports: {ex.Message}");
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private void ResetForm()
+    {
+        reportDto = new FightReportDto();
+        parsedReports = null;
+    }
+
+    private void GoToAttacks()
+    {
+        NavigationManager.NavigateTo("/attacks");
+    }
+}
