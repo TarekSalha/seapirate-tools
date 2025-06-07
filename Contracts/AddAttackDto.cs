@@ -1,4 +1,4 @@
-namespace InselkampfTools.Website.Data;
+namespace SEAPIRATE.Data;
 
 using System.ComponentModel.DataAnnotations;
 

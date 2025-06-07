@@ -1,7 +1,7 @@
 using Azure;
 using Azure.Data.Tables;
 
-namespace SEAPIRATE.Website.Models;
+namespace SEAPIRATE.Models;
 
 public class FightReportEntity : ITableEntity
 {

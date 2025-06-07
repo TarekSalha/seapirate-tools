@@ -1,0 +1,9 @@
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.csproj.AssemblyReference.cache
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.AssemblyInfoInputs.cache
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.AssemblyInfo.cs
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.csproj.CoreCompileInputs.cache
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.RazorAssemblyInfo.cache
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.RazorAssemblyInfo.cs
+C:\Users\TarekSalha\source\seapirate-tools\obj\Debug\net8.0\SEAPIRATE.sourcelink.json

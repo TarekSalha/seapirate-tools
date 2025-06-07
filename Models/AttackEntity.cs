@@ -1,8 +1,8 @@
 using Azure;
 using Azure.Data.Tables;
-using SEAPIRATE.Website.Data;
+using SEAPIRATE.Data;
 
-namespace SEAPIRATE.Website.Models;
+namespace SEAPIRATE.Models;
 
 public class AttackEntity : ITableEntity
 {

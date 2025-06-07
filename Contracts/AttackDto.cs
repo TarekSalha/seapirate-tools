@@ -1,4 +1,4 @@
-namespace InselkampfTools.Website.Data;
+namespace SEAPIRATE.Data;
 
 public class AttackDto
 {

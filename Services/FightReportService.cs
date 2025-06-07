@@ -1,11 +1,11 @@
 using Azure.Data.Tables;
-using SEAPIRATE.Website.Data;
-using SEAPIRATE.Website.Models;
+using SEAPIRATE.Data;
+using SEAPIRATE.Models;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace SEAPIRATE.Website.Services;
+namespace SEAPIRATE.Services;
 
 public class FightReportService
 {

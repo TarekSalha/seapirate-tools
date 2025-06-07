@@ -1,8 +1,8 @@
 using Azure.Data.Tables;
-using SEAPIRATE.Website.Data;
-using SEAPIRATE.Website.Models;
+using SEAPIRATE.Data;
+using SEAPIRATE.Models;
 
-namespace SEAPIRATE.Website.Services;
+namespace SEAPIRATE.Services;
 
 public class AttackService
 {

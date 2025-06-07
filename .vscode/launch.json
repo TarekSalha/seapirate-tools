@@ -13,7 +13,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/net7.0/InselkampfTools.Website.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/SEAPIRATE.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

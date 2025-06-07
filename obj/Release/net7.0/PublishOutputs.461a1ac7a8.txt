@@ -1,7 +1,0 @@
-C:\Users\TarekSalha\source\InselkampfTools\InselkampfTools.Website\bin\Release\net7.0\publish\InselkampfTools.Website.exe
-C:\Users\TarekSalha\source\InselkampfTools\InselkampfTools.Website\bin\Release\net7.0\publish\appsettings.Development.json
-C:\Users\TarekSalha\source\InselkampfTools\InselkampfTools.Website\bin\Release\net7.0\publish\appsettings.json
-C:\Users\TarekSalha\source\InselkampfTools\InselkampfTools.Website\bin\Release\net7.0\publish\InselkampfTools.Website.dll
-C:\Users\TarekSalha\source\InselkampfTools\InselkampfTools.Website\bin\Release\net7.0\publish\InselkampfTools.Website.deps.json
-C:\Users\TarekSalha\source\InselkampfTools\InselkampfTools.Website\bin\Release\net7.0\publish\InselkampfTools.Website.runtimeconfig.json
-C:\Users\TarekSalha\source\InselkampfTools\InselkampfTools.Website\bin\Release\net7.0\publish\InselkampfTools.Website.pdb
