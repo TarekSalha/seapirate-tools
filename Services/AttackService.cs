@@ -41,7 +41,7 @@ public class AttackService
     {
         try
         {
-            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Suggested}");
+            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Suggested.ToString()}");
             var entities = new List<AttackEntity>();
             await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
             {
@@ -60,7 +60,7 @@ public class AttackService
     {
         try
         {
-            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Pending}");
+            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Pending.ToString()}");
             var entities = new List<AttackEntity>();
             await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
             {
@@ -79,7 +79,7 @@ public class AttackService
     {
         try
         {
-            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and (Status eq {AttackStatus.Completed} or Status eq {AttackStatus.Failed})");
+            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and (Status eq {AttackStatus.Completed.ToString()} or Status eq {AttackStatus.Failed.ToString()})");
             var entities = new List<AttackEntity>();
             await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
             {
@@ -117,7 +117,7 @@ public class AttackService
             {
                 var entity = response.Value;
                 entity.Status = AttackStatus.Pending.ToString();
-                entity.StartedAt = DateTime.Now;
+                entity.StartedAt = DateTime.UtcNow; // Use UTC time
                 await _tableClient.UpdateEntityAsync(entity, entity.ETag);
             }
         }
@@ -137,7 +137,7 @@ public class AttackService
             {
                 var entity = response.Value;
                 entity.Status = AttackStatus.Completed.ToString();
-                entity.CompletedAt = DateTime.Now;
+                entity.CompletedAt = DateTime.UtcNow; // Use UTC time
                 entity.FightReportId = fightReportId;
                 entity.ActualResourcesGained = actualResourcesGained;
                 await _tableClient.UpdateEntityAsync(entity, entity.ETag);
@@ -159,7 +159,7 @@ public class AttackService
             {
                 var entity = response.Value;
                 entity.Status = AttackStatus.Failed.ToString();
-                entity.CompletedAt = DateTime.Now;
+                entity.CompletedAt = DateTime.UtcNow; // Use UTC time
                 if (!string.IsNullOrEmpty(notes))
                 {
                     entity.Notes = string.IsNullOrEmpty(entity.Notes) 
@@ -229,7 +229,7 @@ public class AttackService
     {
         try
         {
-            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Pending} and TargetIsland eq {targetIsland} and TargetPlayer eq {targetPlayer}");
+            var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Pending.ToString()} and TargetIsland eq {targetIsland} and TargetPlayer eq {targetPlayer}");
             var entities = new List<AttackEntity>();
             await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
             {

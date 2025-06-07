@@ -203,20 +203,38 @@ public class FightReportService
             }
         }
 
-        // Extract attacker info - format: "Einheiten des Angreifers PlayerName (x:y:z)"
-        var attackerMatch = Regex.Match(report, @"Einheiten des Angreifers\s+([^\s]+)\s+$$(\d+:\d+:\d+)$$");
+        // Extract attacker info - format: "Einheiten des Angreifers PlayerName (x:y:z)" or "Einheiten des Angreifers PlayerName(x:y:z)"
+        var attackerMatch = Regex.Match(report, @"Einheiten des Angreifers (\w+) \((\d+:\d+:\d+)\)");
         if (attackerMatch.Success)
         {
             result.AttackerName = attackerMatch.Groups[1].Value.Trim();
             result.AttackerIsland = attackerMatch.Groups[2].Value.Trim();
+            _logger.LogInformation("Extracted attacker: {Name} at {Island}", result.AttackerName, result.AttackerIsland);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to extract attacker info from: {Text}", 
+                report.Contains("Einheiten des Angreifers") ? 
+                    report.Substring(report.IndexOf("Einheiten des Angreifers"), 
+                        Math.Min(50, report.Length - report.IndexOf("Einheiten des Angreifers"))) : 
+                    "Not found");
         }
 
-        // Extract defender info - format: "Einheiten des Verteidigers unbenannt (x:y:z)"
-        var defenderMatch = Regex.Match(report, @"Einheiten des Verteidigers\s+([^\s]+)\s+$$(\d+:\d+:\d+)$$");
+        // Extract defender info - format: "Einheiten des Verteidigers PlayerName (x:y:z)" or "Einheiten des Verteidigers PlayerName(x:y:z)"
+        var defenderMatch = Regex.Match(report, @"Einheiten des Verteidigers (\w+) \((\d+:\d+:\d+)\)");
         if (defenderMatch.Success)
         {
             result.DefenderName = defenderMatch.Groups[1].Value.Trim();
             result.TargetIsland = defenderMatch.Groups[2].Value.Trim();
+            _logger.LogInformation("Extracted defender: {Name} at {Island}", result.DefenderName, result.TargetIsland);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to extract defender info from: {Text}", 
+                report.Contains("Einheiten des Verteidigers") ? 
+                    report.Substring(report.IndexOf("Einheiten des Verteidigers"), 
+                        Math.Min(50, report.Length - report.IndexOf("Einheiten des Verteidigers"))) : 
+                    "Not found");
         }
 
         // Extract attacker units and losses
