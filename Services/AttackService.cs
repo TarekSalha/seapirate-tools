@@ -29,49 +29,11 @@ public class AttackService
         try
         {
             var existingAttacks = await GetSuggestedAttacksAsync();
-            if (!existingAttacks.Any())
-            {
-                var sampleAttacks = new List<AttackDto>
-                {
-                    new AttackDto
-                    {
-                        TargetIsland = "9:92:10",
-                        TargetPlayer = "unbenannt",
-                        ExpectedResources = 250,
-                        SuggestedTime = DateTime.Now.AddHours(1),
-                        Status = AttackStatus.Suggested,
-                        Notes = "Small inactive island, easy target"
-                    },
-                    new AttackDto
-                    {
-                        TargetIsland = "6:63:9",
-                        TargetPlayer = "unbenannt",
-                        ExpectedResources = 150,
-                        SuggestedTime = DateTime.Now.AddHours(2),
-                        Status = AttackStatus.Suggested,
-                        Notes = "Low resources but safe attack"
-                    },
-                    new AttackDto
-                    {
-                        TargetIsland = "8:36:6",
-                        TargetPlayer = "unbenannt",
-                        ExpectedResources = 300,
-                        SuggestedTime = DateTime.Now.AddHours(3),
-                        Status = AttackStatus.Suggested,
-                        Notes = "Medium value target, attack during night"
-                    }
-                };
-
-                foreach (var attack in sampleAttacks)
-                {
-                    await AddAttackAsync(attack);
-                }
-            }
         }
         catch (Exception ex)
         {
             // Log error but don't fail the service initialization
-            Console.WriteLine($"Error seeding sample data: {ex.Message}");
+            Console.WriteLine($"Error getting attack data: {ex.Message}");
         }
     }
 
@@ -80,7 +42,11 @@ public class AttackService
         try
         {
             var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Suggested}");
-            var entities = await _tableClient.QueryAsync<AttackEntity>(filter).ToListAsync();
+            var entities = new List<AttackEntity>();
+            await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
+            {
+                entities.Add(entity);
+            }
             return entities.Select(e => e.ToDto()).OrderBy(a => a.SuggestedTime).ToList();
         }
         catch (Exception ex)
@@ -95,7 +61,11 @@ public class AttackService
         try
         {
             var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Pending}");
-            var entities = await _tableClient.QueryAsync<AttackEntity>(filter).ToListAsync();
+            var entities = new List<AttackEntity>();
+            await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
+            {
+                entities.Add(entity);
+            }
             return entities.Select(e => e.ToDto()).OrderBy(a => a.StartedAt).ToList();
         }
         catch (Exception ex)
@@ -110,7 +80,11 @@ public class AttackService
         try
         {
             var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and (Status eq {AttackStatus.Completed} or Status eq {AttackStatus.Failed})");
-            var entities = await _tableClient.QueryAsync<AttackEntity>(filter).ToListAsync();
+            var entities = new List<AttackEntity>();
+            await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
+            {
+                entities.Add(entity);
+            }
             return entities.Select(e => e.ToDto()).OrderByDescending(a => a.CompletedAt).ToList();
         }
         catch (Exception ex)
@@ -256,7 +230,11 @@ public class AttackService
         try
         {
             var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId} and Status eq {AttackStatus.Pending} and TargetIsland eq {targetIsland} and TargetPlayer eq {targetPlayer}");
-            var entities = await _tableClient.QueryAsync<AttackEntity>(filter).ToListAsync();
+            var entities = new List<AttackEntity>();
+            await foreach (var entity in _tableClient.QueryAsync<AttackEntity>(filter))
+            {
+                entities.Add(entity);
+            }
             return entities.FirstOrDefault()?.ToDto();
         }
         catch (Exception ex)

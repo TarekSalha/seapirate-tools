@@ -356,7 +356,11 @@ public class FightReportService
         try
         {
             var filter = TableClient.CreateQueryFilter($"PartitionKey eq {_userId}");
-            var entities = await _tableClient.QueryAsync<FightReportEntity>(filter).ToListAsync();
+            var entities = new List<FightReportEntity>();
+            await foreach (var entity in _tableClient.QueryAsync<FightReportEntity>(filter))
+            {
+                entities.Add(entity);
+            }
             return entities.OrderByDescending(e => e.Timestamp).Take(count).ToList();
         }
         catch (Exception ex)
