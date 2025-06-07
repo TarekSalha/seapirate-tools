@@ -100,7 +100,7 @@ public class FightReportService
                 TargetIsland = parsedReport.TargetIsland,
                 ResourcesGained = parsedReport.TotalResourcesGained,
                 AttackSuccessful = parsedReport.AttackSuccessful,
-                AttackTime = parsedReport.AttackTime,
+                AttackTime = parsedReport.AttackTime?.ToUniversalTime(),
                 
                 // Detailed resources - using German resource names
                 WoodGained = parsedReport.HolzGained,
@@ -198,7 +198,8 @@ public class FightReportService
             var germanCulture = new CultureInfo("de-DE");
             if (DateTime.TryParse(dateMatch.Groups[1].Value, germanCulture, DateTimeStyles.None, out DateTime attackTime))
             {
-                result.AttackTime = attackTime;
+                // Convert to UTC as required by Azure SDK
+                result.AttackTime = DateTime.SpecifyKind(attackTime, DateTimeKind.Utc);
             }
         }
 
