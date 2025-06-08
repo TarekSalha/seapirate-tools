@@ -3,6 +3,7 @@
 @using SEAPIRATE.Services
 @inject AuthenticationService AuthService
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Register - SEAPIRATE</PageTitle>
 
@@ -30,31 +31,31 @@
 
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <InputText id="username" class="form-control" Value="@registerModel.Username" ValueChanged="@((string val) => registerModel.Username = val)" />
+                            <InputText id="username" class="form-control" @bind-Value="@registerModel.Username" />
                             <ValidationMessage For="@(() => registerModel.Username)" />
                         </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <InputText id="email" type="email" class="form-control" Value="@registerModel.Email" ValueChanged="@((string val) => registerModel.Email = val)" />
+                            <InputText id="email" type="email" class="form-control" @bind-Value="@registerModel.Email" />
                             <ValidationMessage For="@(() => registerModel.Email)" />
                         </div>
 
                         <div class="mb-3">
                             <label for="displayName" class="form-label">Display Name (Optional)</label>
-                            <InputText id="displayName" class="form-control" Value="@registerModel.DisplayName" ValueChanged="@((string val) => registerModel.DisplayName = val)" />
+                            <InputText id="displayName" class="form-control" @bind-Value="registerModel.DisplayName" />
                             <ValidationMessage For="@(() => registerModel.DisplayName)" />
                         </div>
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <InputText id="password" type="password" class="form-control" Value="@registerModel.Password" ValueChanged="@((string val) => registerModel.Password = val)" />
+                            <InputText id="password" type="password" class="form-control" @bind-Value="registerModel.Password" />
                             <ValidationMessage For="@(() => registerModel.Password)" />
                         </div>
 
                         <div class="mb-3">
                             <label for="confirmPassword" class="form-label">Confirm Password</label>
-                            <InputText id="confirmPassword" type="password" class="form-control" Value="@registerModel.ConfirmPassword" ValueChanged="@((string val) => registerModel.ConfirmPassword = val)" />
+                            <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="registerModel.ConfirmPassword" />
                             <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
                         </div>
 

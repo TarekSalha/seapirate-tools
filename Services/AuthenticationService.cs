@@ -1,5 +1,6 @@
 using Azure.Data.Tables;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using SEAPIRATE.Models;
@@ -13,12 +14,13 @@ public class AuthenticationService
 {
     private readonly TableClient _tableClient;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<AuthenticationService> _logger;
 
     public AuthenticationService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
-        var connectionString = configuration.GetConnectionString("AzureStorage") 
+        var connectionString = configuration.GetConnectionString("AzureStorage")
                               ?? configuration["AzureStorage:ConnectionString"];
-        
+
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException("Azure Storage connection string is not configured. Please check your appsettings.json file.");
@@ -105,6 +107,11 @@ public class AuthenticationService
         }
     }
 
+    // In Azure Table Storage, a good PartitionKey is one that enables efficient queries and scales well.
+    // For user authentication, a common pattern is to use a constant PartitionKey (e.g., "User") for all users,
+    // and use the username (or user ID) as the RowKey. This allows you to query by PartitionKey for all users,
+    // and by PartitionKey + RowKey for a specific user (which is very efficient).
+
     private async Task PerformLoginAsync(UserEntity user)
     {
         // Create authentication cookie
@@ -123,16 +130,26 @@ public class AuthenticationService
             ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30)
         };
 
-        await _httpContextAccessor.HttpContext!.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(claimsIdentity),
-            authProperties);
-
-        // Notify authentication state provider
-        if (_httpContextAccessor.HttpContext.RequestServices.GetService<AuthenticationStateProvider>()
-            is CustomAuthenticationStateProvider authStateProvider)
+        if (_httpContextAccessor.HttpContext != null)
         {
-            authStateProvider.NotifyUserAuthentication(new ClaimsPrincipal(claimsIdentity));
+            if (!_httpContextAccessor.HttpContext.Response.HasStarted)
+            {
+                await _httpContextAccessor.HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
+
+                // Notify authentication state provider
+                if (_httpContextAccessor.HttpContext.RequestServices.GetService<AuthenticationStateProvider>()
+                    is CustomAuthenticationStateProvider authStateProvider)
+                {
+                    authStateProvider.NotifyUserAuthentication(new ClaimsPrincipal(claimsIdentity));
+                }
+            }
+            else
+            {
+                _logger?.LogWarning("Attempted to sign in after the response has already started.");
+            }
         }
     }
 
@@ -156,8 +173,9 @@ public class AuthenticationService
             var response = await _tableClient.GetEntityAsync<UserEntity>("Users", normalizedUsername);
             return response.Value;
         }
-        catch
+        catch (Exception e)
         {
+            _logger.LogError(e, "Error retrieving user by username: {Username}", username);
             return null;
         }
     }

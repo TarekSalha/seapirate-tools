@@ -1,6 +1,7 @@
 using Azure;
 using Azure.Data.Tables;
 using SEAPIRATE.Data;
+using System.Runtime.Serialization;
 
 namespace SEAPIRATE.Models;
 
@@ -12,56 +13,64 @@ public class AttackEntity : ITableEntity
     public Azure.ETag ETag { get; set; }
 
     // Attack properties
-    public string Id { get; set; } = string.Empty;
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string TargetIsland { get; set; } = string.Empty;
-    public string TargetPlayer { get; set; } = string.Empty;
-    public int ExpectedResources { get; set; }
-    public DateTime SuggestedTime { get; set; }
+    public int Latitude { get; set; }
+    public int Longitude { get; set; }
+    public int Ocean { get; set; }
+    public int IslandGroup { get; set; }
+    public int IslandNumber { get; set; }
     public DateTime? StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public string StatusString
+    {
+        get => Status.ToString();
+        set => Status = Enum.Parse<AttackStatus>(value);
+    }
+
+    [IgnoreDataMember] // Optional, for some serializers
+    public AttackStatus Status { get; set; } = AttackStatus.Suggested;
     public string? Notes { get; set; }
     public string? FightReportId { get; set; }
-    public int? ActualResourcesGained { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public enum AttackStatus
+    {
+        Suggested, // not yet executed
+        Pending,   // started and currently executed
+        Succeeded, // successful
+        Failed     // blocked by defender
+    }
 
     public AttackEntity()
     {
         // Required for Azure Table Storage
     }
 
-    public AttackEntity(AttackDto attack, string userId)
+    public AttackEntity(AttackEntity attack, string userId)
     {
         PartitionKey = userId;
-        RowKey = attack.Id.ToString();
-        Id = attack.Id.ToString();
+        RowKey = attack.Id;
+        Id = attack.Id;
         TargetIsland = attack.TargetIsland;
-        TargetPlayer = attack.TargetPlayer;
-        ExpectedResources = attack.ExpectedResources;
-        
-        // Convert all DateTime values to UTC to avoid Azure SDK issues
-        SuggestedTime = attack.SuggestedTime.Kind == DateTimeKind.Utc 
-            ? attack.SuggestedTime 
-            : DateTime.SpecifyKind(attack.SuggestedTime, DateTimeKind.Utc);
-            
-        StartedAt = attack.StartedAt?.Kind == DateTimeKind.Utc 
-            ? attack.StartedAt 
-            : attack.StartedAt.HasValue 
-                ? DateTime.SpecifyKind(attack.StartedAt.Value, DateTimeKind.Utc) 
+        Latitude = attack.Latitude;
+        Longitude = attack.Longitude;
+        Ocean = attack.Ocean;
+        IslandGroup = attack.IslandGroup;
+        IslandNumber = attack.IslandNumber;
+        StartedAt = attack.StartedAt?.Kind == DateTimeKind.Utc
+            ? attack.StartedAt
+            : attack.StartedAt.HasValue
+                ? DateTime.SpecifyKind(attack.StartedAt.Value, DateTimeKind.Utc)
                 : null;
-                
-        CompletedAt = attack.CompletedAt?.Kind == DateTimeKind.Utc 
-            ? attack.CompletedAt 
-            : attack.CompletedAt.HasValue 
-                ? DateTime.SpecifyKind(attack.CompletedAt.Value, DateTimeKind.Utc) 
+        CompletedAt = attack.CompletedAt?.Kind == DateTimeKind.Utc
+            ? attack.CompletedAt
+            : attack.CompletedAt.HasValue
+                ? DateTime.SpecifyKind(attack.CompletedAt.Value, DateTimeKind.Utc)
                 : null;
-                
-        Status = attack.Status.ToString();
+        Status = attack.Status;
         Notes = attack.Notes;
         FightReportId = attack.FightReportId;
-        ActualResourcesGained = attack.ActualResourcesGained;
-        
-        // Set CreatedAt to current UTC time
         CreatedAt = DateTime.UtcNow;
     }
 

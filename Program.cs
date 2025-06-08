@@ -9,23 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-// Add HttpClient for API calls with proper configuration
-builder.Services.AddHttpClient("default", client =>
-{
-    // Base address will be set at runtime
-});
-builder.Services.AddScoped(sp =>
-{
-    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-    return httpClientFactory.CreateClient("default");
-});
-
-// Add HttpContextAccessor for accessing HTTP context in services
-builder.Services.AddHttpContextAccessor();
-
 // Add our custom services
 builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AttackRepository>();
 builder.Services.AddScoped<AttackService>();
 builder.Services.AddScoped<FightReportService>();
 
@@ -39,14 +26,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromDays(30);
         options.SlidingExpiration = true;
     });
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 
 // Add custom authentication state provider
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-
-// Add controllers for API endpoints
-builder.Services.AddControllers();
 
 var app = builder.Build();
 

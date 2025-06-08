@@ -1,8 +1,11 @@
 @page "/Account/Login"
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims;
 @using SEAPIRATE.Services
-@using Microsoft.AspNetCore.Components.Forms
 @inject AuthenticationService AuthService
+@using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager Navigation
+
 
 <PageTitle>Login - SEAPIRATE</PageTitle>
 
@@ -29,7 +32,7 @@
                         <ValidationSummary class="text-danger" />
 
                         <div class="mb-3">
-                            <InputText id="username" class="form-control" @bind-value="loginModel.Username" />
+                            <label for="username" class="form-label">Username</label>
                             <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
                             <ValidationMessage For="@(() => loginModel.Username)" />
                         </div>
