@@ -16,6 +16,21 @@
         </div>
     </div>
 
+    <!-- Suggestion Creation Section -->
+    <div class="row mb-3">
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">💡 Create Suggested Attacks</h4>
+                </div>
+                <div class="card-body">
+                    <InputNumber @bind-Value="numberOfSuggestions" class="form-control mb-2" min="1" placeholder="Number of suggestions" />
+                    <button class="btn btn-info" @onclick="CreateSuggestions">Create Suggestions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Suggested Attacks -->
         <div class="col-lg-4">
@@ -35,11 +50,6 @@
                             <div class="card mb-2 border-info">
                                 <div class="card-body p-3">
                                     <h6 class="card-title">🏝️ @attack.TargetIsland</h6>
-                                    <p class="card-text mb-1">
-                                        <strong>Player:</strong> @attack.TargetPlayer<br>
-                                        <strong>Expected:</strong> @attack.ExpectedResources.ToString("N0") resources<br>
-                                        <strong>Time:</strong> @attack.SuggestedTime.ToString("g")
-                                    </p>
                                     @if (!string.IsNullOrEmpty(attack.Notes))
                                     {
                                         <p class="card-text"><small class="text-muted">@attack.Notes</small></p>
@@ -146,51 +156,21 @@
                         <ValidationSummary class="alert alert-danger" />
                         
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="targetIsland" class="form-label">Target Island:</label>
                                     <InputText id="targetIsland" @bind-Value="newAttack.TargetIsland" class="form-control" placeholder="x:y:z" />
                                     <ValidationMessage For="@(() => newAttack.TargetIsland)" class="text-danger" />
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-8">
                                 <div class="form-group mb-3">
-                                    <label for="targetPlayer" class="form-label">Target Player:</label>
-                                    <InputText id="targetPlayer" @bind-Value="newAttack.TargetPlayer" class="form-control" placeholder="Player name" />
-                                    <ValidationMessage For="@(() => newAttack.TargetPlayer)" class="text-danger" />
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group mb-3">
-                                    <label for="expectedResources" class="form-label">Expected Resources:</label>
-                                    <InputNumber id="expectedResources" @bind-Value="newAttack.ExpectedResources" class="form-control" />
-                                    <ValidationMessage For="@(() => newAttack.ExpectedResources)" class="text-danger" />
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group mb-3">
-                                    <label for="suggestedTime" class="form-label">Suggested Time:</label>
-                                    <InputDate id="suggestedTime" @bind-Value="newAttack.SuggestedTime" class="form-control" />
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group mb-3">
-                                    <label class="form-label">&nbsp;</label>
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary">Add Target</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group">
                                     <label for="notes" class="form-label">Notes:</label>
                                     <InputTextArea id="notes" @bind-Value="newAttack.Notes" class="form-control" rows="2" placeholder="Optional notes about this target..." />
                                 </div>
                             </div>
                         </div>
+                        <button type="submit" class="btn btn-primary">Add Target</button>
                     </EditForm>
                 </div>
             </div>
@@ -203,6 +183,7 @@
     private List<AttackDto> pendingAttacks = new();
     private List<AttackDto> completedAttacks = new();
     private AddAttackDto newAttack = new();
+    private int numberOfSuggestions = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -211,20 +192,20 @@
 
     private async Task LoadAttacks()
     {
-        suggestedAttacks = await AttackService.GetSuggestedAttacksAsync();
-        pendingAttacks = await AttackService.GetPendingAttacksAsync();
-        completedAttacks = await AttackService.GetCompletedAttacksAsync();
+        suggestedAttacks = await AttackService.GetAttacksByStatusAsync(AttackStatus.Suggested);
+        pendingAttacks = await AttackService.GetAttacksByStatusAsync(AttackStatus.Pending);
+        completedAttacks = await AttackService.GetAttacksByStatusAsync(AttackStatus.Succeeded); // or .Failed as needed
     }
 
     private async Task StartAttack(Guid attackId)
     {
-        await AttackService.StartAttackAsync(attackId);
+        await AttackService.UpdateAttackStatusAsync(attackId, AttackStatus.Pending, startedAt: DateTime.UtcNow);
         await LoadAttacks();
     }
 
     private async Task FailAttack(Guid attackId)
     {
-        await AttackService.FailAttackAsync(attackId, "Marked as failed by user");
+        await AttackService.UpdateAttackStatusAsync(attackId, AttackStatus.Failed, completedAt: DateTime.UtcNow);
         await LoadAttacks();
     }
 
@@ -238,9 +219,6 @@
         var attack = new AttackDto
         {
             TargetIsland = newAttack.TargetIsland,
-            TargetPlayer = newAttack.TargetPlayer,
-            ExpectedResources = newAttack.ExpectedResources,
-            SuggestedTime = newAttack.SuggestedTime,
             Notes = newAttack.Notes,
             Status = AttackStatus.Suggested
         };
@@ -248,5 +226,10 @@
         await AttackService.AddAttackAsync(attack);
         newAttack = new AddAttackDto();
         await LoadAttacks();
+    }
+
+    private void CreateSuggestions()
+    {
+        // TODO: Implement suggestion creation logic
     }
 }

@@ -69,7 +69,7 @@ public class AttackService
             FightReportId = attackDto.FightReportId,
             CreatedAt = DateTime.UtcNow
         };
-        await _repo.UpdateAttackAsync(userId, entity);
+        await _repo.UpdateAttackAsync(userId, entity.Id, updatedEntity: entity);
     }
 
     public async Task DeleteAttackAsync(Guid id)
@@ -81,36 +81,31 @@ public class AttackService
     public async Task UpdateAttackStatusAsync(Guid id, AttackEntity.AttackStatus status, DateTime? startedAt = null)
     {
         var userId = await GetCurrentUserIdAsync();
-        var attack = await _repo.GetAttackByIdAsync(userId, id);
-        if (attack == null) return;
-        attack.Status = status;
-        if (startedAt.HasValue)
-            attack.StartedAt = startedAt.Value;
-        await _repo.UpdateAttackAsync(userId, attack);
+        await _repo.UpdateAttackAsync(userId, id, status: status, startedAt: startedAt);
     }
 
     public async Task CompleteAttackAsync(Guid id, string fightReportId, int actualResourcesGained, DateTime completedAt)
     {
         var userId = await GetCurrentUserIdAsync();
-        // To mark as completed:
-        var attack = await _repo.GetAttackByIdAsync(userId, id);
-        if (attack == null) return;
-        attack.Status = AttackEntity.AttackStatus.Succeeded;
-        attack.FightReportId = fightReportId;
-        attack.ActualResourcesGained = actualResourcesGained;
-        attack.CompletedAt = completedAt;
-        await _repo.UpdateAttackAsync(userId, attack);
+        await _repo.UpdateAttackAsync(
+            userId,
+            id,
+            status: AttackEntity.AttackStatus.Succeeded,
+            fightReportId: fightReportId,
+            actualResourcesGained: actualResourcesGained,
+            completedAt: completedAt
+        );
     }
 
     public async Task FailAttackAsync(Guid id, string? notes, DateTime failedAt)
     {
         var userId = await GetCurrentUserIdAsync();
-        // To mark as failed:
-        var attack = await _repo.GetAttackByIdAsync(userId, id);
-        if (attack == null) return;
-        attack.Status = AttackEntity.AttackStatus.Failed;
-        attack.Notes = notes;
-        attack.FailedAt = failedAt;
-        await _repo.UpdateAttackAsync(userId, attack);
+        await _repo.UpdateAttackAsync(
+            userId,
+            id,
+            status: AttackEntity.AttackStatus.Failed,
+            notes: notes,
+            completedAt: failedAt
+        );
     }
 }
