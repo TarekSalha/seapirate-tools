@@ -11,9 +11,19 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank" rel="noreferrer">About</a>
+        <div class="top-row px-4 auth">
+            <AuthorizeView>
+                <Authorized>
+                    <span class="text-white">Welcome, @context.User.Identity?.Name!</span>
+                    <a href="/Account/Logout" class="ml-md-auto text-white">Logout</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/Account/Register" class="text-white">Register</a>
+                    <a href="/Account/Login" class="text-white">Login</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
+
         <article class="content px-4">
             @Body
         </article>

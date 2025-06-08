@@ -1,0 +1,152 @@
+@page "/Account/Register"
+@using System.ComponentModel.DataAnnotations
+@using SEAPIRATE.Services
+@inject AuthenticationService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Register - SEAPIRATE</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">🏴‍☠️ Join SEAPIRATE</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">@errorMessage</div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="alert alert-success">@successMessage</div>
+                    }
+
+                    <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" />
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <InputText id="username" class="form-control" Value="@registerModel.Username" ValueChanged="@((string val) => registerModel.Username = val)" />
+                            <ValidationMessage For="@(() => registerModel.Username)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <InputText id="email" type="email" class="form-control" Value="@registerModel.Email" ValueChanged="@((string val) => registerModel.Email = val)" />
+                            <ValidationMessage For="@(() => registerModel.Email)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="displayName" class="form-label">Display Name (Optional)</label>
+                            <InputText id="displayName" class="form-control" Value="@registerModel.DisplayName" ValueChanged="@((string val) => registerModel.DisplayName = val)" />
+                            <ValidationMessage For="@(() => registerModel.DisplayName)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <InputText id="password" type="password" class="form-control" Value="@registerModel.Password" ValueChanged="@((string val) => registerModel.Password = val)" />
+                            <ValidationMessage For="@(() => registerModel.Password)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <InputText id="confirmPassword" type="password" class="form-control" Value="@registerModel.ConfirmPassword" ValueChanged="@((string val) => registerModel.ConfirmPassword = val)" />
+                            <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                Register
+                            </button>
+                        </div>
+                    </EditForm>
+
+                    <hr />
+                    <div class="text-center">
+                        <p>Already have an account? <a href="/Account/Login">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterModel registerModel = new();
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+    private bool isLoading = false;
+
+    private async Task HandleRegister()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            if (registerModel.Password != registerModel.ConfirmPassword)
+            {
+                errorMessage = "Passwords do not match.";
+                return;
+            }
+
+            // Just register the user, don't try to login immediately
+            var (success, message) = await AuthService.RegisterUserAsync(
+                registerModel.Username, 
+                registerModel.Email, 
+                registerModel.Password, 
+                registerModel.DisplayName);
+            
+            if (success)
+            {
+                successMessage = "Registration successful! Please login with your credentials.";
+                // Redirect to login page after a short delay
+                await Task.Delay(2000);
+                Navigation.NavigateTo("/Account/Login");
+            }
+            else
+            {
+                errorMessage = message;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred during registration: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    public class RegisterModel
+    {
+        [Required]
+        [StringLength(50, MinimumLength = 3)]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [StringLength(100)]
+        public string DisplayName { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}

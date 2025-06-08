@@ -1,9 +1,10 @@
 @page "/fightreport"
-@page "/"
 @using SEAPIRATE.Data
 @using SEAPIRATE.Services
+@using Microsoft.AspNetCore.Components.Forms
 @inject FightReportService FightReportService
 @inject NavigationManager NavigationManager
+@attribute [Authorize]
 
 <PageTitle>SEAPIRATE - Fight Report Parser</PageTitle>
 

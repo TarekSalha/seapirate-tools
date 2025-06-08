@@ -1,0 +1,58 @@
+@page "/dashboard"
+@attribute [Authorize]
+
+<PageTitle>SEAPIRATE - Dashboard</PageTitle>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">🏴‍☠️ Captain's Dashboard</h1>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-1 mb-3">⚔️</div>
+                            <h5 class="card-title">Attack Management</h5>
+                            <p class="card-text">Plan and coordinate your raids</p>
+                            <a href="/current-attacks" class="btn btn-primary">Manage Attacks</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-1 mb-3">📊</div>
+                            <h5 class="card-title">Fight Reports</h5>
+                            <p class="card-text">Parse and analyze battle results</p>
+                            <a href="/fightreport" class="btn btn-primary">Parse Reports</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-1 mb-3">📈</div>
+                            <h5 class="card-title">Analytics</h5>
+                            <p class="card-text">Strategic insights and statistics</p>
+                            <a href="/analytics" class="btn btn-primary">View Analytics</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-1 mb-3">🗺️</div>
+                            <h5 class="card-title">Fleet Status</h5>
+                            <p class="card-text">Monitor your naval forces</p>
+                            <button class="btn btn-secondary" disabled>Coming Soon</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

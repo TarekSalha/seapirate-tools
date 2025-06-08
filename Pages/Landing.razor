@@ -1,0 +1,219 @@
+@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+
+<PageTitle>SEAPIRATE - Inselkampf Tools</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="container mt-5">
+            <div class="alert alert-info">
+                <h4>Welcome back, Captain!</h4>
+                <p>You are already logged in. <a href="/dashboard">Go to Dashboard</a></p>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="landing-page">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="container">
+                    <div class="row align-items-center min-vh-100">
+                        <div class="col-lg-6">
+                            <div class="hero-content">
+                                <h1 class="display-3 fw-bold text-white mb-4">
+                                    🏴‍☠️ SEAPIRATE
+                                </h1>
+                                <h2 class="h3 text-light mb-4">
+                                    Your Ultimate Inselkampf Command Center
+                                </h2>
+                                <p class="lead text-light mb-5">
+                                    Master the seas with advanced attack management, intelligent battle report analysis, 
+                                    and strategic planning tools designed for serious Inselkampf players.
+                                </p>
+                                <div class="cta-buttons">
+                                    <a href="/Account/Login" class="btn btn-primary btn-lg me-3 mb-3">
+                                        ⚔️ Set Sail - Login
+                                    </a>
+                                    <a href="/Account/Register" class="btn btn-outline-light btn-lg mb-3">
+                                        🆕 Join the Crew - Register
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="hero-image text-center">
+                                <div class="feature-preview">
+                                    <div class="preview-card">
+                                        <h5>⚔️ Attack Management</h5>
+                                        <p>Plan and track your raids</p>
+                                    </div>
+                                    <div class="preview-card">
+                                        <h5>📊 Battle Analysis</h5>
+                                        <p>Parse fight reports instantly</p>
+                                    </div>
+                                    <div class="preview-card">
+                                        <h5>📈 Strategic Analytics</h5>
+                                        <p>Optimize your conquest</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section py-5 bg-light">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 text-center mb-5">
+                            <h2 class="display-5 fw-bold">Why Choose SEAPIRATE?</h2>
+                            <p class="lead">Built by pirates, for pirates</p>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="feature-card text-center p-4">
+                                <div class="feature-icon mb-3">⚔️</div>
+                                <h4>Attack Management</h4>
+                                <p>Organize your raids with precision. Track targets, schedules, and coordinate your fleet for maximum impact.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card text-center p-4">
+                                <div class="feature-icon mb-3">📊</div>
+                                <h4>Battle Report Analysis</h4>
+                                <p>Instantly parse fight reports to extract valuable intelligence. Learn from every battle to improve your strategy.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card text-center p-4">
+                                <div class="feature-icon mb-3">🎯</div>
+                                <h4>Strategic Planning</h4>
+                                <p>Make data-driven decisions with comprehensive analytics and insights from your conquest history.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section py-5 bg-primary text-white">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <h2 class="display-6 fw-bold mb-4">Ready to Dominate the Seas?</h2>
+                            <p class="lead mb-4">Join thousands of successful pirates using SEAPIRATE to conquer the islands.</p>
+                            <div class="cta-buttons">
+                                <a href="/Account/Register" class="btn btn-light btn-lg me-3 mb-3">
+                                    🚀 Start Your Journey
+                                </a>
+                                <a href="/Account/Login" class="btn btn-outline-light btn-lg mb-3">
+                                    ⚓ Existing Captain? Login
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="footer py-4 bg-dark text-white">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <p class="mb-0">
+                                &copy; 2024 SEAPIRATE - Inselkampf Tools | 
+                                <small class="text-muted">Built for the pirate community</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+<style>
+    .landing-page {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .feature-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .preview-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .preview-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn {
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+
+    .footer {
+        background: #2c3e50 !important;
+    }
+</style>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+}
