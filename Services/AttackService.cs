@@ -37,14 +37,11 @@ public class AttackService
         var userId = await GetCurrentUserIdAsync();
         var entity = new AttackEntity
         {
-            Id = attackDto.Id,
+            Id = Guid.Parse(attackDto.Id),
             TargetIsland = attackDto.TargetIsland,
-            ScheduledAt = attackDto.ScheduledAt,
-            ActualResourcesGained = attackDto.ActualResourcesGained,
             StartedAt = attackDto.StartedAt,
             CompletedAt = attackDto.CompletedAt,
-            FailedAt = attackDto.FailedAt,
-            Status = attackDto.Status,
+            Status = (AttackEntity.AttackStatus)attackDto.Status,
             Notes = attackDto.Notes,
             FightReportId = attackDto.FightReportId,
             CreatedAt = DateTime.UtcNow
@@ -57,14 +54,11 @@ public class AttackService
         var userId = await GetCurrentUserIdAsync();
         var entity = new AttackEntity
         {
-            Id = attackDto.Id,
+            Id = Guid.Parse(attackDto.Id),
             TargetIsland = attackDto.TargetIsland,
-            ScheduledAt = attackDto.ScheduledAt,
-            ActualResourcesGained = attackDto.ActualResourcesGained,
             StartedAt = attackDto.StartedAt,
             CompletedAt = attackDto.CompletedAt,
-            FailedAt = attackDto.FailedAt,
-            Status = attackDto.Status,
+            Status = (AttackEntity.AttackStatus)attackDto.Status,
             Notes = attackDto.Notes,
             FightReportId = attackDto.FightReportId,
             CreatedAt = DateTime.UtcNow
@@ -84,7 +78,7 @@ public class AttackService
         await _repo.UpdateAttackAsync(userId, id, status: status, startedAt: startedAt);
     }
 
-    public async Task CompleteAttackAsync(Guid id, string fightReportId, int actualResourcesGained, DateTime completedAt)
+    public async Task CompleteAttackAsync(Guid id, string fightReportId, DateTime completedAt)
     {
         var userId = await GetCurrentUserIdAsync();
         await _repo.UpdateAttackAsync(
@@ -92,12 +86,11 @@ public class AttackService
             id,
             status: AttackEntity.AttackStatus.Succeeded,
             fightReportId: fightReportId,
-            actualResourcesGained: actualResourcesGained,
             completedAt: completedAt
         );
     }
 
-    public async Task FailAttackAsync(Guid id, string? notes, DateTime failedAt)
+    public async Task FailAttackAsync(Guid id, string? notes, DateTime completedAt)
     {
         var userId = await GetCurrentUserIdAsync();
         await _repo.UpdateAttackAsync(
@@ -105,7 +98,14 @@ public class AttackService
             id,
             status: AttackEntity.AttackStatus.Failed,
             notes: notes,
-            completedAt: failedAt
+            completedAt: completedAt
         );
+    }
+
+    public async Task<AttackDto?> FindPendingAttackByTargetAsync(string targetIsland)
+    {
+        var userId = await GetCurrentUserIdAsync();
+        var entity = await _repo.FindPendingAttackByTargetAsync(userId, targetIsland);
+        return entity?.ToDto();
     }
 }

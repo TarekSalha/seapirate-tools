@@ -15,15 +15,11 @@ public class FightReportService
     private readonly ILogger<FightReportService> _logger;
 
     public FightReportService(
-        IConfiguration configuration, 
+        TableClientFactory factory,
         AttackService attackService,
         ILogger<FightReportService> logger)
     {
-        var connectionString = configuration.GetConnectionString("AzureStorage") 
-            ?? configuration["AzureStorage:ConnectionString"];
-        
-        var serviceClient = new TableServiceClient(connectionString);
-        _tableClient = serviceClient.GetTableClient("fightreports");
+        _tableClient = factory.GetClient("fightreports");
         _attackService = attackService;
         _logger = logger;
         
@@ -124,8 +120,7 @@ public class FightReportService
             if (!string.IsNullOrEmpty(parsedReport.TargetIsland))
             {
                 var pendingAttack = await _attackService.FindPendingAttackByTargetAsync(
-                    parsedReport.TargetIsland, 
-                    parsedReport.DefenderName ?? "unbenannt");
+                    parsedReport.TargetIsland);
                 
                 if (pendingAttack != null)
                 {
@@ -134,9 +129,9 @@ public class FightReportService
                     
                     // Complete the attack
                     await _attackService.CompleteAttackAsync(
-                        pendingAttack.Id, 
+                        Guid.Parse(pendingAttack.Id), 
                         reportId, 
-                        parsedReport.TotalResourcesGained ?? 0);
+                        parsedReport.AttackTime ?? DateTime.UtcNow);
                 }
             }
 

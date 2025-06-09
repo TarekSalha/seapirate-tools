@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using SEAPIRATE.Services;
+using SEAPIRATE.Repositories;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
+using Azure.Data.Tables;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +34,26 @@ builder.Services.AddAuthorization();
 
 // Add custom authentication state provider
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+// Register TableClients for each table
+builder.Services.AddSingleton<TableClient>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("AzureStorage") 
+        ?? configuration["AzureStorage:ConnectionString"];
+    return new TableClient(connectionString, "attacks");
+});
+
+builder.Services.AddSingleton<TableClient>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("AzureStorage") 
+        ?? configuration["AzureStorage:ConnectionString"];
+    return new TableClient(connectionString, "fightreports");
+});
+
+// Repeat for other tables as needed (e.g., Users)
+builder.Services.AddSingleton<TableClientFactory>();
 
 var app = builder.Build();
 

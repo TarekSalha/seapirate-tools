@@ -84,8 +84,7 @@
                                 <div class="card-body p-3">
                                     <h6 class="card-title">🏝️ @attack.TargetIsland</h6>
                                     <p class="card-text mb-1">
-                                        <strong>Player:</strong> @attack.TargetPlayer<br>
-                                        <strong>Expected:</strong> @attack.ExpectedResources.ToString("N0") resources<br>
+                                        <strong>Expected:</strong> @attack.StartedAt.Value.AddHours(1).ToString("g")<br>
                                         <strong>Started:</strong> @attack.StartedAt?.ToString("g")
                                     </p>
                                     <div class="btn-group btn-group-sm" role="group">
@@ -119,20 +118,15 @@
                     {
                         @foreach (var attack in completedAttacks)
                         {
-                            <div class="card mb-2 @(attack.Status == AttackStatus.Completed ? "border-success" : "border-danger")">
+                            <div class="card mb-2 @(attack.Status == AttackStatus.Succeeded ? "border-success" : "border-danger")">
                                 <div class="card-body p-3">
                                     <h6 class="card-title">🏝️ @attack.TargetIsland</h6>
                                     <p class="card-text mb-1">
-                                        <strong>Player:</strong> @attack.TargetPlayer<br>
-                                        <strong>Expected:</strong> @attack.ExpectedResources.ToString("N0")<br>
-                                        @if (attack.Status == AttackStatus.Completed)
-                                        {
-                                            <strong>Actual:</strong> <span class="text-success">@attack.ActualResourcesGained?.ToString("N0")</span><br>
-                                        }
+                                        <strong>Started:</strong> @attack.StartedAt?.ToString("g")<br>
                                         <strong>Completed:</strong> @attack.CompletedAt?.ToString("g")
                                     </p>
-                                    <span class="badge @(attack.Status == AttackStatus.Completed ? "bg-success" : "bg-danger")">
-                                        @(attack.Status == AttackStatus.Completed ? "✅ Success" : "❌ Failed")
+                                    <span class="badge @(attack.Status == AttackStatus.Succeeded ? "bg-success" : "bg-danger")">
+                                        @(attack.Status == AttackStatus.Succeeded ? "✅ Success" : "❌ Failed")
                                     </span>
                                 </div>
                             </div>
@@ -192,20 +186,20 @@
 
     private async Task LoadAttacks()
     {
-        suggestedAttacks = await AttackService.GetAttacksByStatusAsync(AttackStatus.Suggested);
-        pendingAttacks = await AttackService.GetAttacksByStatusAsync(AttackStatus.Pending);
-        completedAttacks = await AttackService.GetAttacksByStatusAsync(AttackStatus.Succeeded); // or .Failed as needed
+        suggestedAttacks = await AttackService.GetAttacksByStatusAsync((SEAPIRATE.Models.AttackEntity.AttackStatus)AttackStatus.Suggested);
+        pendingAttacks = await AttackService.GetAttacksByStatusAsync((SEAPIRATE.Models.AttackEntity.AttackStatus)AttackStatus.Pending);
+        completedAttacks = await AttackService.GetAttacksByStatusAsync((SEAPIRATE.Models.AttackEntity.AttackStatus)AttackStatus.Succeeded); // or .Failed as needed
     }
 
     private async Task StartAttack(Guid attackId)
     {
-        await AttackService.UpdateAttackStatusAsync(attackId, AttackStatus.Pending, startedAt: DateTime.UtcNow);
+        await AttackService.UpdateAttackStatusAsync(attackId, (SEAPIRATE.Models.AttackEntity.AttackStatus)AttackStatus.Pending, startedAt: DateTime.UtcNow);
         await LoadAttacks();
     }
 
     private async Task FailAttack(Guid attackId)
     {
-        await AttackService.UpdateAttackStatusAsync(attackId, AttackStatus.Failed, completedAt: DateTime.UtcNow);
+        await AttackService.CompleteAttackAsync(attackId, AttackStatus.Failed.ToString(), completedAt: DateTime.UtcNow);
         await LoadAttacks();
     }
 

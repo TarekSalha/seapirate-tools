@@ -50,7 +50,7 @@ public class AttackEntity : ITableEntity
     public AttackEntity(AttackEntity attack, string userId)
     {
         PartitionKey = userId;
-        RowKey = attack.Id;
+        RowKey = attack.Id.ToString("N"); // Use a consistent format for RowKey
         Id = attack.Id;
         TargetIsland = attack.TargetIsland;
         Latitude = attack.Latitude;
@@ -78,17 +78,13 @@ public class AttackEntity : ITableEntity
     {
         return new AttackDto
         {
-            Id = Guid.Parse(Id),
+            Id = Id.ToString("N"),
             TargetIsland = TargetIsland,
-            TargetPlayer = TargetPlayer,
-            ExpectedResources = ExpectedResources,
-            SuggestedTime = SuggestedTime,
             StartedAt = StartedAt,
             CompletedAt = CompletedAt,
-            Status = Enum.Parse<AttackStatus>(Status),
+            Status = (SEAPIRATE.Data.AttackStatus)(int)Status,
             Notes = Notes,
             FightReportId = FightReportId,
-            ActualResourcesGained = ActualResourcesGained
         };
     }
 }

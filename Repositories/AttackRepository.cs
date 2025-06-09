@@ -8,9 +8,9 @@ public class AttackRepository
 {
     private readonly TableClient _tableClient;
 
-    public AttackRepository(TableClient tableClient)
+    public AttackRepository(TableClientFactory factory)
     {
-        _tableClient = tableClient;
+        _tableClient = factory.GetClient("attacks");
     }
 
     public async Task<List<AttackEntity>> GetAttacksByStatusAsync(string userId, AttackEntity.AttackStatus status)
@@ -58,7 +58,6 @@ public class AttackRepository
         if (entity == null) throw new Exception("Attack not found");
         entity.Status = status;
         if (fightReportId != null) entity.FightReportId = fightReportId;
-        if (actualResourcesGained.HasValue) entity.ActualResourcesGained = actualResourcesGained.Value;
         if (notes != null) entity.Notes = notes;
         if (completedAt.HasValue) entity.CompletedAt = completedAt;
         if (startedAt.HasValue) entity.StartedAt = startedAt;
@@ -71,7 +70,6 @@ public class AttackRepository
         AttackEntity? updatedEntity = null,
         AttackEntity.AttackStatus? status = null,
         string? fightReportId = null,
-        int? actualResourcesGained = null,
         string? notes = null,
         DateTime? completedAt = null,
         DateTime? startedAt = null)
@@ -98,12 +96,19 @@ public class AttackRepository
 
         if (status.HasValue) entity.Status = status.Value;
         if (fightReportId != null) entity.FightReportId = fightReportId;
-        if (actualResourcesGained.HasValue) entity.ActualResourcesGained = actualResourcesGained.Value;
         if (notes != null) entity.Notes = notes;
         if (completedAt.HasValue) entity.CompletedAt = completedAt;
         if (startedAt.HasValue) entity.StartedAt = startedAt;
 
         await _tableClient.UpdateEntityAsync(entity, entity.ETag);
+    }
+
+    public async Task<AttackEntity?> FindPendingAttackByTargetAsync(string userId, string targetIsland)
+    {
+        var filter = TableClient.CreateQueryFilter(
+            $"PartitionKey eq {userId} and StatusString eq 'Pending' and TargetIsland eq {targetIsland}");
+        var results = await QueryAttacksAsync(filter);
+        return results.FirstOrDefault();
     }
 
     private async Task<List<AttackEntity>> QueryAttacksAsync(string filter)
