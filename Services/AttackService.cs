@@ -37,7 +37,7 @@ public class AttackService
         var userId = await GetCurrentUserIdAsync();
         var entity = new AttackEntity
         {
-            Id = Guid.Parse(attackDto.Id),
+            Id = string.IsNullOrWhiteSpace(attackDto.Id) ? Guid.NewGuid() : Guid.Parse(attackDto.Id),
             TargetIsland = attackDto.TargetIsland,
             StartedAt = attackDto.StartedAt,
             CompletedAt = attackDto.CompletedAt,
